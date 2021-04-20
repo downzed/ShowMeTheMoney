@@ -1,0 +1,31 @@
+{
+  "name": "tenbis-reOpen-ext",
+  "manifest_version": 2,
+  "version": "1",
+  "description": "sends notification on demand for re-opening restaurants",
+  "permissions": [
+    "tabs",
+    "webNavigation",
+    "https://www.10bis.co.il/next/*"
+  ],
+  "background": {
+    "persistent": true,
+    "scripts": [
+      "src/scripts/consts.js",
+      "src/scripts/background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.10bis.co.il/next/*"
+      ],
+      "js": [
+        "src/scripts/consts.js",
+        "src/scripts/logger.js",
+        "src/scripts/contentscript.js"
+      ],
+      "css" : ["src/styles/window.css"]
+    }
+  ]
+}
