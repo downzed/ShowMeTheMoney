@@ -172,26 +172,7 @@ const invokeByRequestMessage = {
               setTimeout(close, 200);
             }
           }, 100);
-
-          
-          // passButton.onclick = () => close();
         });
-
-        // const menuBody = `
-        //   <h1 class='--reOpen-ext--text'>
-        //     wanna be notify when restaurant is back to open?
-        //   </h1>
-        // `;
-        
-        // rootEl.classList.add('--reOpen-ext--root');
-        // rootEl.innerHTML = menuBody;
-
-        // document.body.insertBefore(rootEl, document.body.firstChild);
-
-        // setTimeout(() => { // just for opacity effect.
-        //   logger('Presenting ui');
-        //   rootEl.classList.add('--reOpen-ext--with-opacity');
-        // }, 1000);
       });
     });
   },
