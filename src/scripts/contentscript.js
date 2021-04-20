@@ -1,13 +1,42 @@
-const MAX_NUMBER_OF_TRIES = 5;
-const WAIT_BEFORE_NEXT_TRY_MS = 1000;
+
 const rootEl = document.createElement('div');
 
+const getAddressFromContextCookie = (docCookie = document.cookie) => {
+  const cookieName = 'WebApplication.Context';
+  const cookieAsJson = Object.fromEntries(docCookie.split('; ').map(x => x.split(/=(.*)$/,2).map(decodeURIComponent)));
+  
+  try {
+    const {longitude, latitude} = JSON.parse(cookieAsJson['lastlatlng']);
+    const paramsString = cookieAsJson['WebApplication.Context'];
+    let searchParams = new URLSearchParams(paramsString);
+  
+    const addressId = searchParams.get('AddressId');
+    const cityId = searchParams.get('SearchCityId');
+    const streetId = searchParams.get('SearchStreetId');
+    const houseNumber = searchParams.get('SearchHouseNumber');
+
+    const addressKey = `${cityId}-${streetId}-${houseNumber}`;
+    return {
+      addressKey,
+      addressId,
+      longitude,
+      latitude
+    }
+  } catch (error) {
+    // probably user doesnt have lastlatlng in the cookie 
+    // (means that he didnt set an address)
+    logger('probably without address at all', error);
+    return;
+  }
+};
+
 const invokeOnRestaurantClosed = (tryNumber = 0, cb) => {
+  
   if (tryNumber === 0) {
     logger('Checking if closed');
   }
 
-  if (tryNumber === MAX_NUMBER_OF_TRIES) {
+  if (tryNumber === consts.searchIfClosedOptions.MAX_NUMBER_OF_TRIES) {
     logger('Couldnt find, giving up, the restaurants is probably open');
     return;
   }
@@ -17,9 +46,9 @@ const invokeOnRestaurantClosed = (tryNumber = 0, cb) => {
   
   if (!closedEl) {
     setTimeout(() => {
-      logger(`try number: ${tryNumber}`);
+      logger(`isClosed try number: ${tryNumber} failed`);
       return invokeOnRestaurantClosed(tryNumber + 1, cb)
-    }, WAIT_BEFORE_NEXT_TRY_MS);
+    }, consts.searchIfClosedOptions.WAIT_BEFORE_NEXT_TRY_MS);
 
     return;
   }
@@ -27,34 +56,75 @@ const invokeOnRestaurantClosed = (tryNumber = 0, cb) => {
   cb(closedEl);
 };
 
-const invokeByRequestMessage = {
-  [consts.CUSTOM_EVENTS.IN_RESTAURANT_DELIVERY_PAGE]: request => {
-    // extra prop example.. todo: delete at end.
-    logger('------------------------------------------');
-    logger('restaurant', {restaurantId: request.restaurantId, restaurantName: request.restaurantName});
+const invokeOnHavingAddress = (tryNumber = 0, cb) => {
+  if (tryNumber === 0) {
+    logger('Checking if has address');
+  }
 
+  if (tryNumber === consts.searchIfHasAddressOptions.MAX_NUMBER_OF_TRIES) {
+    logger('Couldnt find address, giving up');
+    return;
+  }
+
+  // this element we will decide if the restaurant is closed.
+  const currentAddressEl = document.querySelectorAll("[class^=styledaddress__ActiveAddressWrapper]")[0];
+  if (!currentAddressEl?.innerHTML) {
+    setTimeout(() => {
+      // has no address lets re-try.
+      logger(`hasAddress? try number: ${tryNumber} failed`);
+      return invokeOnHavingAddress(tryNumber + 1, cb);
+    }, consts.searchIfHasAddressOptions.WAIT_BEFORE_NEXT_TRY_MS)
+
+    return;
+  }
+
+  cb(currentAddressEl);
+};
+
+const invokeByRequestMessage = {
+  [consts.CUSTOM_EVENTS.IN_RESTAURANT_PAGE]: request => {
+    logger('------------------------------------------');
+    logger('restaurant info', {
+      deliveryMethod: request.deliveryMethod,
+      restaurantId: request.restaurantId,
+      restaurantName: request.restaurantName
+    });
+
+    // confirming current restaurant is closed
     invokeOnRestaurantClosed(undefined, closedEl => {
       logger('Restaurant found as closed', closedEl);
 
-      // todo: onClick event (clicking on wanting a notification)
-      // fetch data for request.restaurantId ...
+      // confirming user has active address
+      invokeOnHavingAddress(undefined, activeAddressEl => {
+        // everything is fine lets build the ui ^^
+        logger('Found active address', activeAddressEl);
 
-      // lets present the window ui to offer the notification.
-      // how can we design it easier?
-      const menuBody = `
-        <h1 class='--reOpen-ext--text'>
-          wanna be notify when restaurant is back to open?
-        </h1>
-      `;
-      
-      rootEl.classList.add('--reOpen-ext--root');
-      rootEl.innerHTML = menuBody;
+        const addressInfo = getAddressFromContextCookie();
 
-      document.body.insertBefore(rootEl, document.body.firstChild);
-      setTimeout(() => {
-        logger('Presenting ui');
-        rootEl.classList.add('--reOpen-ext--with-opacity');
-      }, 1000);
+        if (!addressInfo) {
+          console.error('[ReOpen EXT]', addressInfo);
+          throw new Error('wtf ... why cant we get addressInfo??');
+          return;
+        }
+
+        logger('addressInfo', addressInfo);
+
+        const menuBody = `
+          <h1 class='--reOpen-ext--text'>
+            wanna be notify when restaurant is back to open?
+          </h1>
+        `;
+        
+        rootEl.classList.add('--reOpen-ext--root');
+        rootEl.innerHTML = menuBody;
+
+        document.body.insertBefore(rootEl, document.body.firstChild);
+
+        setTimeout(() => { // just for opacity effect.
+          logger('Presenting ui');
+          rootEl.classList.add('--reOpen-ext--with-opacity');
+        }, 1000);
+      });
     });
   },
   [consts.CUSTOM_EVENTS.CLEAR_UI_IF_NEED]: () => {
@@ -63,8 +133,10 @@ const invokeByRequestMessage = {
     }
 
     logger('Clearing ui');
+    
     rootEl.classList.remove('--reOpen-ext--with-opacity');
-    setTimeout(() => {
+
+    setTimeout(() => { // just for opacity effect.
       rootEl.innerHTML = '';
     }, 1000);
   },
