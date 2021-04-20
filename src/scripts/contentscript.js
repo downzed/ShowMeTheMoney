@@ -81,6 +81,18 @@ const invokeOnHavingAddress = (tryNumber = 0, cb) => {
   cb(currentAddressEl);
 };
 
+function close() {
+  if (!rootEl.innerHTML) {
+    return;
+  }
+
+  logger('Clearing ui');
+  setTimeout(() => {
+    rootEl.classList.remove('--reOpen-ext--root');
+    rootEl.classList.remove('--reOpen-ext--with-opacity');
+  }, 200);
+}
+
 const invokeByRequestMessage = {
   [consts.CUSTOM_EVENTS.IN_RESTAURANT_PAGE]: request => {
     logger('------------------------------------------');
