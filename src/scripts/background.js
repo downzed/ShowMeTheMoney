@@ -10,7 +10,7 @@ chrome.extension.onMessage.addListener(function (message, sender, reply) {
     chrome.browserAction.setBadgeText({text: '+'})
     return;
   }
-  chrome.browserAction.setBadgeText({ text: '' })
+  // chrome.browserAction.setBadgeText({ text: '' })
 });
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
