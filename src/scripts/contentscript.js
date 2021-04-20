@@ -1,72 +1,95 @@
-const MAX_NUMBER_OF_TRIES = 5;
-const WAIT_BEFORE_NEXT_TRY_MS = 1000;
-const rootEl = document.createElement('div');
-
-const invokeOnRestaurantClosed = (tryNumber = 0, cb) => {
-  if (tryNumber === 0) {
-    logger('Checking if closed');
-  }
-
-  if (tryNumber === MAX_NUMBER_OF_TRIES) {
-    logger('Couldnt find, giving up, the restaurants is probably open');
-    return;
-  }
-
-  // this element we will decide if the restaurant is closed.
-  const closedEl = document.querySelectorAll("[class^=MenuPageCover__ClosedCoverText]")[0];
+const getAddressFromContextCookie = (docCookie = document.cookie) => {
+  const cookieName = 'WebApplication.Context';
+  const cookieAsJson = Object.fromEntries(docCookie.split('; ').map(x => x.split(/=(.*)$/,2).map(decodeURIComponent)));
   
-  if (!closedEl) {
+  try {
+    const {longitude, latitude} = JSON.parse(cookieAsJson['lastlatlng']);
+    const paramsString = cookieAsJson['WebApplication.Context'];
+    let searchParams = new URLSearchParams(paramsString);
+  
+    const addressId = searchParams.get('AddressId');
+    const cityId = searchParams.get('SearchCityId');
+    const streetId = searchParams.get('SearchStreetId');
+    const houseNumber = searchParams.get('SearchHouseNumber');
+
+    const addressKey = `${cityId}-${streetId}-${houseNumber}`;
+    return {
+      addressKey,
+      addressId,
+      longitude,
+      latitude
+    }
+  } catch (error) {
+    // probably user doesnt have lastlatlng in the cookie 
+    // (means that he didnt set an address)
+    logger('probably without address at all', error);
+    return;
+  }
+};
+
+const invokeOnClosedRestaurantModalAppearing = (tryNumber = 0, cb) => {
+  if (tryNumber === 0) {
+    logger('Checking closed modal appears in the DOM');
+  }
+
+  if (tryNumber === consts.searchForCloseModalOptions.MAX_NUMBER_OF_TRIES) {
+    logger('Couldnt find closed modal, giving up');
+    return;
+  }
+ 
+  const closedModalEl = document.querySelector('[data-id=closed-restaurant-modal]');
+
+  if (!closedModalEl) {
+
     setTimeout(() => {
-      logger(`try number: ${tryNumber}`);
-      return invokeOnRestaurantClosed(tryNumber + 1, cb)
-    }, WAIT_BEFORE_NEXT_TRY_MS);
+      // has no address lets re-try.
+      logger(`has closed modal? try number: ${tryNumber} failed`);
+      return invokeOnClosedRestaurantModalAppearing(tryNumber + 1, cb);
+    }, consts.searchForCloseModalOptions.WAIT_BEFORE_NEXT_TRY_MS);
 
     return;
   }
 
-  cb(closedEl);
+  const allInnerButtons = closedModalEl.querySelectorAll('button');
+  const targetButton = allInnerButtons[allInnerButtons.length - 1];
+
+  cb(targetButton);
 };
 
 const invokeByRequestMessage = {
-  [consts.CUSTOM_EVENTS.IN_RESTAURANT_DELIVERY_PAGE]: request => {
-    // extra prop example.. todo: delete at end.
+  [consts.CUSTOM_EVENTS.IN_RESTAURANT_PAGE]: request => {
     logger('------------------------------------------');
-    logger('restaurant', {restaurantId: request.restaurantId, restaurantName: request.restaurantName});
-
-    invokeOnRestaurantClosed(undefined, closedEl => {
-      logger('Restaurant found as closed', closedEl);
-
-      // todo: onClick event (clicking on wanting a notification)
-      // fetch data for request.restaurantId ...
-
-      // lets present the window ui to offer the notification.
-      // how can we design it easier?
-      const menuBody = `
-        <h1 class='--reOpen-ext--text'>
-          wanna be notify when restaurant is back to open?
-        </h1>
-      `;
-      
-      rootEl.classList.add('--reOpen-ext--root');
-      rootEl.innerHTML = menuBody;
-
-      document.body.insertBefore(rootEl, document.body.firstChild);
-      setTimeout(() => {
-        logger('Presenting ui');
-        rootEl.classList.add('--reOpen-ext--with-opacity');
-      }, 1000);
+    logger('restaurant info', {
+      deliveryMethod: request.deliveryMethod,
+      restaurantId: request.restaurantId,
+      restaurantName: request.restaurantName
     });
-  },
-  [consts.CUSTOM_EVENTS.CLEAR_UI_IF_NEED]: () => {
-    if (!rootEl.innerHTML) {
-      return;
-    }
 
-    logger('Clearing ui');
-    rootEl.classList.remove('--reOpen-ext--with-opacity');
-    setTimeout(() => {
-      rootEl.innerHTML = '';
-    }, 1000);
+    invokeOnClosedRestaurantModalAppearing(undefined, targetButton => {
+      logger('Found closed modal and took control over the button', targetButton);
+
+      const addressInfo = getAddressFromContextCookie();
+
+      if (!addressInfo) {
+        console.error('[ReOpen EXT]', addressInfo);
+        throw new Error('wtf ... why cant we get addressInfo??');
+        return;
+      }
+
+      logger('addressInfo', addressInfo);
+
+      // on click will take 10bis's closed modal off the dom.
+      // so success / error state should be invoked differently.
+
+      targetButton.onclick = event => {
+        // send fetch request with everything we currently have
+        event.preventDefault();
+        
+        console.log('user clicked to notify him');
+      };
+
+      targetButton.innerHTML = 'Notify me';
+    });
   },
 };
 
