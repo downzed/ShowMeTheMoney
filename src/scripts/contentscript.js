@@ -27,6 +27,7 @@ const invokeOnRestaurantClosed = (tryNumber = 0, cb) => {
   cb(closedEl);
 };
 
+
 const invokeByRequestMessage = {
   [consts.CUSTOM_EVENTS.IN_RESTAURANT_DELIVERY_PAGE]: request => {
     // extra prop example.. todo: delete at end.
@@ -41,33 +42,63 @@ const invokeByRequestMessage = {
 
       // lets present the window ui to offer the notification.
       // how can we design it easier?
+
       const menuBody = `
-        <h1 class='--reOpen-ext--text'>
-          wanna be notify when restaurant is back to open?
-        </h1>
+        <div class='--reOpen-ext--text'>
+          <div>
+            wanna be notified when restaurant is back to open?
+          </div>
+          <button id="sureButton">
+            sure
+          </button>
+          <button>
+            pass
+          </button>
+        </div>
       `;
       
       rootEl.classList.add('--reOpen-ext--root');
       rootEl.innerHTML = menuBody;
-
       document.body.insertBefore(rootEl, document.body.firstChild);
-      setTimeout(() => {
-        logger('Presenting ui');
-        rootEl.classList.add('--reOpen-ext--with-opacity');
-      }, 1000);
+
+      function close() {
+        if (!rootEl.innerHTML) {
+          return;
+        }
+
+        logger('Clearing ui');
+        setTimeout(() => {
+          rootEl.classList.remove('--reOpen-ext--root');
+          rootEl.classList.remove('--reOpen-ext--with-opacity');
+        }, 200);
+      }
+
+      chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
+        let list = result[consts.LOCALSTORAGE_ITEM_NAME]
+        if (list.indexOf(request.restaurantId) > -1) {
+          logger(window.decodeURI(request.restaurantName) + ' Already in queue');
+          chrome.extension.sendMessage({ flash: true })
+          return;
+        }
+        setTimeout(() => {
+          logger('Presenting ui');
+          rootEl.classList.add('--reOpen-ext--with-opacity');
+        }, 100);
+
+        let sureButton = document.getElementById('sureButton');
+        let passButton = document.getElementById('passButton');
+
+        sureButton.onclick = () => {
+          list.push(request.restaurantId)
+          chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list });
+          rootEl.innerHTML = 'added';
+          setTimeout(close, 200);
+        }
+        passButton.onclick = close;
+      });
     });
   },
-  [consts.CUSTOM_EVENTS.CLEAR_UI_IF_NEED]: () => {
-    if (!rootEl.innerHTML) {
-      return;
-    }
-
-    logger('Clearing ui');
-    rootEl.classList.remove('--reOpen-ext--with-opacity');
-    setTimeout(() => {
-      rootEl.innerHTML = '';
-    }, 1000);
-  },
+  [consts.CUSTOM_EVENTS.CLEAR_UI_IF_NEED]: close
 };
 
 chrome.runtime.onMessage.addListener(
