@@ -1,3 +1,10 @@
+// chrome.storage.local.clear(function () {
+//   var error = chrome.runtime.lastError;
+//   if (error) {
+//     console.error(error);
+//   }
+// });
+
 chrome.extension.onMessage.addListener(function (message, sender, reply) {
   if (message.flash) {
     chrome.browserAction.setBadgeText({text: '+'})

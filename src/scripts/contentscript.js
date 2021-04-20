@@ -28,6 +28,18 @@ const invokeOnRestaurantClosed = (tryNumber = 0, cb) => {
 };
 
 
+function close() {
+  if (!rootEl.innerHTML) {
+    return;
+  }
+
+  logger('Clearing ui');
+  setTimeout(() => {
+    rootEl.classList.remove('--reOpen-ext--root');
+    rootEl.classList.remove('--reOpen-ext--with-opacity');
+  }, 200);
+}
+
 const invokeByRequestMessage = {
   [consts.CUSTOM_EVENTS.IN_RESTAURANT_DELIVERY_PAGE]: request => {
     // extra prop example.. todo: delete at end.
@@ -46,7 +58,7 @@ const invokeByRequestMessage = {
       const menuBody = `
         <div class='--reOpen-ext--text'>
           <div>
-            wanna be notified when restaurant is back to open?
+            Notify me
           </div>
           <button id="sureButton">
             sure
@@ -61,23 +73,12 @@ const invokeByRequestMessage = {
       rootEl.innerHTML = menuBody;
       document.body.insertBefore(rootEl, document.body.firstChild);
 
-      function close() {
-        if (!rootEl.innerHTML) {
-          return;
-        }
-
-        logger('Clearing ui');
-        setTimeout(() => {
-          rootEl.classList.remove('--reOpen-ext--root');
-          rootEl.classList.remove('--reOpen-ext--with-opacity');
-        }, 200);
-      }
-
       chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
-        let list = result[consts.LOCALSTORAGE_ITEM_NAME]
-        if (list.indexOf(request.restaurantId) > -1) {
+        let list = result[consts.LOCALSTORAGE_ITEM_NAME] || [];
+        if (list.length && list.indexOf(request.restaurantId) > -1) {
           logger(window.decodeURI(request.restaurantName) + ' Already in queue');
-          chrome.extension.sendMessage({ flash: true })
+          chrome.extension.sendMessage({ flash: true });
+          close();
           return;
         }
         setTimeout(() => {
@@ -91,10 +92,11 @@ const invokeByRequestMessage = {
         sureButton.onclick = () => {
           list.push(request.restaurantId)
           chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list });
-          rootEl.innerHTML = 'added';
+          rootEl.innerHTML = 'added'; 
+          chrome.extension.sendMessage({ flash: true });
           setTimeout(close, 200);
         }
-        passButton.onclick = close;
+        passButton.onclick = () => close();
       });
     });
   },
