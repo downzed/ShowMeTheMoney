@@ -110,20 +110,76 @@ const invokeByRequestMessage = {
         logger('addressInfo', addressInfo);
 
         const menuBody = `
-          <h1 class='--reOpen-ext--text'>
-            wanna be notify when restaurant is back to open?
-          </h1>
+          <div class='--reOpen-ext--text'>
+            <div>
+              notify me
+            </div>
+            <button id="sureButton">
+              sure
+            </button>
+            <button>
+              pass
+            </button>
+          </div>
         `;
-        
+
         rootEl.classList.add('--reOpen-ext--root');
         rootEl.innerHTML = menuBody;
-
         document.body.insertBefore(rootEl, document.body.firstChild);
 
-        setTimeout(() => { // just for opacity effect.
-          logger('Presenting ui');
-          rootEl.classList.add('--reOpen-ext--with-opacity');
-        }, 1000);
+        function close() {
+          if (!rootEl.innerHTML) {
+            return;
+          }
+
+          logger('Clearing ui');
+          setTimeout(() => {
+            rootEl.classList.remove('--reOpen-ext--root');
+            rootEl.classList.remove('--reOpen-ext--with-opacity');
+          }, 200);
+        }
+
+        chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
+          let list = result[consts.LOCALSTORAGE_ITEM_NAME] || []
+          if (list.length && list.indexOf(request.restaurantId) > -1) {
+            logger(window.decodeURI(request.restaurantName) + ' Already in queue');
+            chrome.extension.sendMessage({ flash: true })
+            return;
+          }
+          setTimeout(() => {
+            logger('Presenting ui');
+            rootEl.classList.add('--reOpen-ext--with-opacity');
+            let sureButton = document.getElementById('sureButton');
+            let passButton = document.getElementById('passButton');
+
+            sureButton.onclick = () => {
+              list.push(request.restaurantId)
+              chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list });
+              chrome.extension.sendMessage({ flash: true })
+              rootEl.innerHTML = 'added';
+              setTimeout(close, 200);
+            }
+          }, 100);
+
+          
+          // passButton.onclick = () => close();
+        });
+
+        // const menuBody = `
+        //   <h1 class='--reOpen-ext--text'>
+        //     wanna be notify when restaurant is back to open?
+        //   </h1>
+        // `;
+        
+        // rootEl.classList.add('--reOpen-ext--root');
+        // rootEl.innerHTML = menuBody;
+
+        // document.body.insertBefore(rootEl, document.body.firstChild);
+
+        // setTimeout(() => { // just for opacity effect.
+        //   logger('Presenting ui');
+        //   rootEl.classList.add('--reOpen-ext--with-opacity');
+        // }, 1000);
       });
     });
   },
@@ -140,6 +196,7 @@ const invokeByRequestMessage = {
       rootEl.innerHTML = '';
     }, 1000);
   },
+  [consts.CUSTOM_EVENTS.CLEAR_UI_IF_NEED]: close
 };
 
 chrome.runtime.onMessage.addListener(

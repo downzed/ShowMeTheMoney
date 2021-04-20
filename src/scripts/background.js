@@ -1,3 +1,18 @@
+chrome.storage.local.clear(function () {
+  const error = chrome.runtime.lastError;
+  if (error) {
+    console.error(error);
+  }
+});
+
+chrome.extension.onMessage.addListener(function (message, sender, reply) {
+  if (message.flash) {
+    chrome.browserAction.setBadgeText({text: '+'})
+    return;
+  }
+  chrome.browserAction.setBadgeText({ text: '' })
+});
+
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
   if (changeInfo.status !== 'complete') {
@@ -26,5 +41,4 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     restaurantId,
     restaurantName,
   });
-
 });

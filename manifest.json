@@ -6,6 +6,8 @@
   "permissions": [
     "tabs",
     "webNavigation",
+    "activeTab",
+    "storage",
     "https://www.10bis.co.il/next/*"
   ],
   "background": {
@@ -14,6 +16,9 @@
       "src/scripts/consts.js",
       "src/scripts/background.js"
     ]
+  },
+  "browser_action": {
+    "default_popup": "src/popup.html"
   },
   "content_scripts": [
     {
