@@ -99,6 +99,7 @@ const invokeByRequestMessage = {
             resName: window.decodeURI(request.restaurantName),
             resImg
           };
+
           
           if (list.length && list.indexOf(restaurantItem) > -1) {
             logger(restaurantItem.resName + ' Already in queue');
