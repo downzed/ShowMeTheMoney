@@ -18,6 +18,7 @@ chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
 	wrapper.appendChild(listContainer);
 	
 	list.forEach(item => {
+		console.log(item)
 		if (item) {
 			const li = document.createElement('li');
 			const innerHTML = `
