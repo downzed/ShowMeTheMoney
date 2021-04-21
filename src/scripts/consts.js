@@ -1,5 +1,6 @@
 const consts = {
   LOCALSTORAGE_ITEM_NAME: '__10bis_extension_list',
+  LOCALSTORAGE_QUE_NAME: '__10bis_extension_que',
   CUSTOM_EVENTS: {
     'IN_RESTAURANT_PAGE': 'IN_RESTAURANT_PAGE',
   },

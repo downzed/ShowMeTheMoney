@@ -81,6 +81,17 @@ const invokeByRequestMessage = {
 
       // on click will take 10bis's closed modal off the dom.
       // so success / error state should be invoked differently.
+      const restaurantLogoNode = document.querySelector('[class*="DiagonalHeaderView__CircleImage"');
+      const restaurantNameNode = document.querySelector('[class*="RestaurantInfo__RestaurantName"').innerText;
+      const resImg = restaurantLogoNode?.getAttribute('src') || 'https://d25t2285lxl5rf.cloudfront.net/images/shops/default.png';
+
+      chrome.storage.local.set({
+        [consts.LOCALSTORAGE_QUE_NAME]: {
+          resId: request.restaurantId,
+          resName: restaurantNameNode,
+          resImg
+        } 
+      });
 
       targetButton.onclick = event => {
         // send fetch request with everything we currently have
@@ -91,16 +102,13 @@ const invokeByRequestMessage = {
         // TODO: change logic to check for addressId || restId before clicking 'Notify Me'
         chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
           let list = result[consts.LOCALSTORAGE_ITEM_NAME] || [];
-          const restaurantLogoNode = document.querySelector('[class*="DiagonalHeaderView__CircleImage"')
-          const resImg = restaurantLogoNode?.getAttribute('src') || 'https://d25t2285lxl5rf.cloudfront.net/images/shops/default.png'
 
-          let restaurantItem = {
+          const restaurantItem = {
             resId: request.restaurantId,
-            resName: window.decodeURI(request.restaurantName),
+            resName: restaurantNameNode,
             resImg
           };
 
-          
           if (list.length && list.indexOf(restaurantItem) > -1) {
             logger(restaurantItem.resName + ' Already in queue');
             chrome.extension.sendMessage({ flash: true })
@@ -108,7 +116,6 @@ const invokeByRequestMessage = {
           }
           console.log(`restaurantItem`, restaurantItem)
           list.push(restaurantItem);
-          console.log(list)
           chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list });
           chrome.extension.sendMessage({ flash: true })
         });
