@@ -1,9 +1,6 @@
-<p align="center">
-  
-  ![EXT-Logo-60](https://user-images.githubusercontent.com/6795014/115529538-a95ce480-a29b-11eb-8e56-3249da635fea.png)
+<p align="center"><img width="60" alt="logo" src="https://user-images.githubusercontent.com/6795014/115529538-a95ce480-a29b-11eb-8e56-3249da635fea.png"></p>
+<p align="center"><img width="757" alt="Cover" src="https://user-images.githubusercontent.com/6795014/115500417-e912d480-a279-11eb-8857-e1f04143626e.png"></p>
 
-  <img width="757" alt="Cover" src="https://user-images.githubusercontent.com/6795014/115500417-e912d480-a279-11eb-8857-e1f04143626e.png">
-</p>
 
 # tenbis-reOpen-ext
 Chrome extension that provides you with browser notifications as soon as a previously selected closed restaurant reopens.
