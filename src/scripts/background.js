@@ -9,9 +9,11 @@ function getListLength() {
   chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
     let list = result[consts.LOCALSTORAGE_ITEM_NAME] || [];
     if (list.length > 0) {
-      chrome.browserAction.setBadgeText({ text: list.length > 5 ? '+5' : list.length.toString() })
+      chrome.browserAction.setBadgeText({ text: list.length > 5 ? '+5' : list.length.toString() });
+      chrome.browserAction.setBadgeBackgroundColor({ color: '#ea7702' });
+      return;
     }
-
+    chrome.browserAction.setBadgeText({ text: '' })
   })
 }
 
@@ -21,7 +23,6 @@ chrome.extension.onMessage.addListener(function (message, sender, reply) {
   
   if (message.flash) {
     chrome.browserAction.setBadgeText({text: '!'})
-    chrome.browserAction.setBadgeBackgroundColor({color: '#ea7702'})
     return;
   }
   getListLength()
