@@ -1,10 +1,13 @@
 
-body {
-	direction: rtl;
+html {
 	padding: 12px;
-	width: 299px;
-	height: 200px;
+	width: 360px;
+	height: 268px;
 	overflow: auto;
+	background: #F8F5F2;
+	border: 0.5px solid #BABABA;
+	box-sizing: border-box;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
 }
 #--reOpen-ext-list {
 	padding: 0;
@@ -13,15 +16,36 @@ body {
 }
 
 #--reOpen-ext-list li {
-	height: 30px;
-	display: flex;
-	align-items: center;
-	margin: 8px 0;
-	padding: 0 8px;
-	border-radius: 4px;
-	border: 1px solid #dedede;
+	width: 328px;
+	height: 64px;
+	background: #FFFFFF;
+	border-radius: 5px;
 }
 
 #--reOpen-ext-list li:hover {
-	border: 1px solid #b1b1b1;
+	background: 1px solid #FDFDFD;
+}
+
+.ext-list-item {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 8px;
+}
+
+.ext-list-item-details {
+	display: flex;
+	align-items: center;
+}
+
+
+.ext-list-item img.ext-rest-logo {
+	width: 32px;
+	border-radius: 50%;
+	margin-right: 4px;
+}
+.ext-list-item img.ext-close-icon {
+	width: 12px;
+	cursor: pointer;
 }
