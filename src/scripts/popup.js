@@ -5,14 +5,16 @@ function createEmptyPage(wrapperElement, subtext) {
 	trackButton.innerHTML = 'Track this restaurant';
 
 	chrome.storage.local.get([consts.LOCALSTORAGE_QUE_NAME], (result) => {
-		const resItem = result[consts.LOCALSTORAGE_QUE_NAME] || {};
-		if (Object.keys(resItem).length > 0) {
+		const localQueItem = result[consts.LOCALSTORAGE_QUE_NAME] || {};
+		if (Object.keys(localQueItem).length > 0) {
 			trackButton.onclick = function () {
 				let list = [];
-				list.push(resItem);
+				list.push(localQueItem);
+
 				chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list }, function (){
 					setTimeout(function () {
-						window.location.reload()
+						chrome.storage.local.remove(consts.LOCALSTORAGE_QUE_NAME);
+						window.location.reload();
 					}, 100)
 				});
 			}
@@ -34,6 +36,9 @@ function handleRemoveItem(removeItem) {
 		list = list.filter((item) => item.resId !== removeItem.resId);
 
 		chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list }, function () {
+			if (!list.length) {
+				chrome.storage.local.set({ [consts.LOCALSTORAGE_QUE_NAME]: removeItem });
+			}
 			chrome.extension.sendMessage({ flash: false })
 			setTimeout(function () {
 				window.location.reload()
