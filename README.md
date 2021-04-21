@@ -8,11 +8,14 @@ Chrome extension that provides you with browser notifications as soon as a previ
 based on `"manifest_version": 2`
 
 
-## figma
-https://www.figma.com/file/LLk8UtIzC46isNgSbBx93T/%23hack-1-21-reopen-ext?node-id=3%3A0
+## Figma
 
-<img width="911" alt="Screen Shot 2021-04-21 at 8 22 51" src="https://user-images.githubusercontent.com/6795014/115500873-d51ba280-a27a-11eb-8841-0345d087273e.png">
 
-<img width="911" alt="Motivation" src="https://user-images.githubusercontent.com/6795014/115500642-5fafd200-a27a-11eb-943d-6267623f52f4.png">
+<img width="965" alt="Add to queue" src="https://raw.githubusercontent.com/downzed/tenbis-reOpen-ext/main/Screenshots/1.png">
 
-<img width="872" alt="Screen Shot 2021-04-21 at 8 26 41" src="https://user-images.githubusercontent.com/6795014/115501133-5115ea80-a27b-11eb-8b0f-8c492e8dbb2a.png">
+<img width="965" alt="Success" src="https://raw.githubusercontent.com/downzed/tenbis-reOpen-ext/main/Screenshots/2.png">
+
+<img width="965" alt="Queue" src="https://raw.githubusercontent.com/downzed/tenbis-reOpen-ext/main/Screenshots/3.png">
+
+<img width="965" alt="Notification" src="https://raw.githubusercontent.com/downzed/tenbis-reOpen-ext/main/Screenshots/4.png">
+
