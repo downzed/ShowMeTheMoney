@@ -1,15 +1,12 @@
-
-const rootEl = document.createElement('div');
-
 const getAddressFromContextCookie = (docCookie = document.cookie) => {
   const cookieName = 'WebApplication.Context';
-  const cookieAsJson = Object.fromEntries(docCookie.split('; ').map(x => x.split(/=(.*)$/,2).map(decodeURIComponent)));
-  
+  const cookieAsJson = Object.fromEntries(docCookie.split('; ').map(x => x.split(/=(.*)$/, 2).map(decodeURIComponent)));
+
   try {
-    const {longitude, latitude} = JSON.parse(cookieAsJson['lastlatlng']);
+    const { longitude, latitude } = JSON.parse(cookieAsJson['lastlatlng']);
     const paramsString = cookieAsJson['WebApplication.Context'];
     let searchParams = new URLSearchParams(paramsString);
-  
+
     const addressId = searchParams.get('AddressId');
     const cityId = searchParams.get('SearchCityId');
     const streetId = searchParams.get('SearchStreetId');
@@ -30,68 +27,34 @@ const getAddressFromContextCookie = (docCookie = document.cookie) => {
   }
 };
 
-const invokeOnRestaurantClosed = (tryNumber = 0, cb) => {
-  
+const invokeOnClosedRestaurantModalAppearing = (tryNumber = 0, cb) => {
   if (tryNumber === 0) {
-    logger('Checking if closed');
+    logger('Checking closed modal appears in the DOM');
   }
 
-  if (tryNumber === consts.searchIfClosedOptions.MAX_NUMBER_OF_TRIES) {
-    logger('Couldnt find, giving up, the restaurants is probably open');
+  if (tryNumber === consts.searchForCloseModalOptions.MAX_NUMBER_OF_TRIES) {
+    logger('Couldnt find closed modal, giving up');
     return;
   }
 
-  // this element we will decide if the restaurant is closed.
-  const closedEl = document.querySelectorAll("[class^=MenuPageCover__ClosedCoverText]")[0];
-  
-  if (!closedEl) {
-    setTimeout(() => {
-      logger(`isClosed try number: ${tryNumber} failed`);
-      return invokeOnRestaurantClosed(tryNumber + 1, cb)
-    }, consts.searchIfClosedOptions.WAIT_BEFORE_NEXT_TRY_MS);
+  const closedModalEl = document.querySelector('[data-id=closed-restaurant-modal]');
 
-    return;
-  }
+  if (!closedModalEl) {
 
-  cb(closedEl);
-};
-
-const invokeOnHavingAddress = (tryNumber = 0, cb) => {
-  if (tryNumber === 0) {
-    logger('Checking if has address');
-  }
-
-  if (tryNumber === consts.searchIfHasAddressOptions.MAX_NUMBER_OF_TRIES) {
-    logger('Couldnt find address, giving up');
-    return;
-  }
-
-  // this element we will decide if the restaurant is closed.
-  const currentAddressEl = document.querySelectorAll("[class^=styledaddress__ActiveAddressWrapper]")[0];
-  if (!currentAddressEl?.innerHTML) {
     setTimeout(() => {
       // has no address lets re-try.
-      logger(`hasAddress? try number: ${tryNumber} failed`);
-      return invokeOnHavingAddress(tryNumber + 1, cb);
-    }, consts.searchIfHasAddressOptions.WAIT_BEFORE_NEXT_TRY_MS)
+      logger(`has closed modal? try number: ${tryNumber} failed`);
+      return invokeOnClosedRestaurantModalAppearing(tryNumber + 1, cb);
+    }, consts.searchForCloseModalOptions.WAIT_BEFORE_NEXT_TRY_MS);
 
     return;
   }
 
-  cb(currentAddressEl);
+  const allInnerButtons = closedModalEl.querySelectorAll('button');
+  const targetButton = allInnerButtons[allInnerButtons.length - 1];
+
+  cb(targetButton);
 };
-
-function close() {
-  if (!rootEl.innerHTML) {
-    return;
-  }
-
-  logger('Clearing ui');
-  setTimeout(() => {
-    rootEl.classList.remove('--reOpen-ext--root');
-    rootEl.classList.remove('--reOpen-ext--with-opacity');
-  }, 200);
-}
 
 const invokeByRequestMessage = {
   [consts.CUSTOM_EVENTS.IN_RESTAURANT_PAGE]: request => {
@@ -99,107 +62,61 @@ const invokeByRequestMessage = {
     logger('restaurant info', {
       deliveryMethod: request.deliveryMethod,
       restaurantId: request.restaurantId,
-      restaurantName: request.restaurantName
+      restaurantName: request.restaurantName,
     });
+    const restaurantItem = { resId: request.restaurantId, resName: window.decodeURI(request.restaurantName), resImg: '' }
 
-    // confirming current restaurant is closed
-    invokeOnRestaurantClosed(undefined, closedEl => {
-      logger('Restaurant found as closed', closedEl);
+    invokeOnClosedRestaurantModalAppearing(undefined, targetButton => {
+      logger('Found closed modal and took control over the button', targetButton);
 
-      // confirming user has active address
-      invokeOnHavingAddress(undefined, activeAddressEl => {
-        // everything is fine lets build the ui ^^
-        logger('Found active address', activeAddressEl);
+      const addressInfo = getAddressFromContextCookie();
 
-        const addressInfo = getAddressFromContextCookie();
+      if (!addressInfo) {
+        console.error('[ReOpen EXT]', addressInfo);
+        throw new Error('wtf ... why cant we get addressInfo??');
+        return;
+      }
 
-        if (!addressInfo) {
-          console.error('[ReOpen EXT]', addressInfo);
-          throw new Error('wtf ... why cant we get addressInfo??');
-          return;
-        }
+      logger('addressInfo', addressInfo);
 
-        logger('addressInfo', addressInfo);
+      // on click will take 10bis's closed modal off the dom.
+      // so success / error state should be invoked differently.
 
-        const menuBody = `
-          <div class='--reOpen-ext--text'>
-            <div>
-              notify me
-            </div>
-            <button id="sureButton">
-              sure
-            </button>
-            <button>
-              pass
-            </button>
-          </div>
-        `;
+      targetButton.onclick = event => {
+        // send fetch request with everything we currently have
+        event.preventDefault();
 
-        rootEl.classList.add('--reOpen-ext--root');
-        rootEl.innerHTML = menuBody;
-        document.body.insertBefore(rootEl, document.body.firstChild);
+        console.log('user clicked to notify him');
 
-        function close() {
-          if (!rootEl.innerHTML) {
-            return;
-          }
-
-          logger('Clearing ui');
-          setTimeout(() => {
-            rootEl.classList.remove('--reOpen-ext--root');
-            rootEl.classList.remove('--reOpen-ext--with-opacity');
-          }, 200);
-        }
-
+        // TODO: change logic to check for addressId || restId before clicking 'Notify Me'
         chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
-          let list = result[consts.LOCALSTORAGE_ITEM_NAME] || []
-          if (list.length && list.indexOf(request.restaurantId) > -1) {
-            logger(window.decodeURI(request.restaurantName) + ' Already in queue');
+          let list = result[consts.LOCALSTORAGE_ITEM_NAME] || [];
+          if (list.length && list.indexOf(restaurantItem) > -1) {
+            logger(restaurantItem.resName + ' Already in queue');
             chrome.extension.sendMessage({ flash: true })
             return;
           }
-          setTimeout(() => {
-            logger('Presenting ui');
-            rootEl.classList.add('--reOpen-ext--with-opacity');
-            let sureButton = document.getElementById('sureButton');
-            let passButton = document.getElementById('passButton');
 
-            sureButton.onclick = () => {
-              list.push(request.restaurantId)
-              chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list });
-              chrome.extension.sendMessage({ flash: true })
-              rootEl.innerHTML = 'added';
-              setTimeout(close, 200);
-            }
-          }, 100);
+          list.push(restaurantItem);
+          console.log(list)
+          chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list });
+          chrome.extension.sendMessage({ flash: true })
         });
-      });
+      };
+
+      targetButton.innerHTML = 'Notify me';
     });
   },
-  [consts.CUSTOM_EVENTS.CLEAR_UI_IF_NEED]: () => {
-    if (!rootEl.innerHTML) {
-      return;
-    }
-
-    logger('Clearing ui');
-    
-    rootEl.classList.remove('--reOpen-ext--with-opacity');
-
-    setTimeout(() => { // just for opacity effect.
-      rootEl.innerHTML = '';
-    }, 1000);
-  },
-  [consts.CUSTOM_EVENTS.CLEAR_UI_IF_NEED]: close
 };
 
 chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
+  function (request, sender, sendResponse) {
     // listen for messages sent from background.js
     try {
       invokeByRequestMessage[request.message](request);
-    } catch(error) {
-      logger('Message not recognized', {message: request.message});
+    } catch (error) {
+      logger('Message not recognized', { message: request.message });
       console.error('[ReOpen EXT]', error);
-    };   
+    };
   }
 );

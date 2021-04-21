@@ -4,7 +4,7 @@ chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
 	if (list.length > 0) {
 		list.forEach(item => {
 			const li = document.createElement('li')
-			li.innerHTML = item;
+			li.innerHTML = item.resName;
 			container.appendChild(li)
 		});
 		chrome.extension.sendMessage({ flash: false })

@@ -10,7 +10,7 @@ chrome.extension.onMessage.addListener(function (message, sender, reply) {
     chrome.browserAction.setBadgeText({text: '+'})
     return;
   }
-  // chrome.browserAction.setBadgeText({ text: '' })
+  chrome.browserAction.setBadgeText({ text: '' })
 });
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
@@ -21,10 +21,6 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
   const isInMenuPage = tab.url.indexOf(consts.MENU_PAGE_URL) !== -1;
   if (!isInMenuPage) {
-
-    chrome.tabs.sendMessage(tabId, {
-      message: consts.CUSTOM_EVENTS.CLEAR_UI_IF_NEED,
-    });
     return;
   }
 
@@ -41,4 +37,5 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     restaurantId,
     restaurantName,
   });
+
 });
