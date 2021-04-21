@@ -1,12 +1,12 @@
 const getAddressFromContextCookie = (docCookie = document.cookie) => {
   const cookieName = 'WebApplication.Context';
-  const cookieAsJson = Object.fromEntries(docCookie.split('; ').map(x => x.split(/=(.*)$/, 2).map(decodeURIComponent)));
-
+  const cookieAsJson = Object.fromEntries(docCookie.split('; ').map(x => x.split(/=(.*)$/,2).map(decodeURIComponent)));
+  
   try {
-    const { longitude, latitude } = JSON.parse(cookieAsJson['lastlatlng']);
+    const {longitude, latitude} = JSON.parse(cookieAsJson['lastlatlng']);
     const paramsString = cookieAsJson['WebApplication.Context'];
     let searchParams = new URLSearchParams(paramsString);
-
+  
     const addressId = searchParams.get('AddressId');
     const cityId = searchParams.get('SearchCityId');
     const streetId = searchParams.get('SearchStreetId');
@@ -26,7 +26,6 @@ const getAddressFromContextCookie = (docCookie = document.cookie) => {
     return;
   }
 };
-
 const invokeOnClosedRestaurantModalAppearing = (tryNumber = 0, cb) => {
   if (tryNumber === 0) {
     logger('Checking closed modal appears in the DOM');
@@ -36,7 +35,7 @@ const invokeOnClosedRestaurantModalAppearing = (tryNumber = 0, cb) => {
     logger('Couldnt find closed modal, giving up');
     return;
   }
-
+ 
   const closedModalEl = document.querySelector('[data-id=closed-restaurant-modal]');
 
   if (!closedModalEl) {
@@ -64,7 +63,12 @@ const invokeByRequestMessage = {
       restaurantId: request.restaurantId,
       restaurantName: request.restaurantName,
     });
-    const restaurantItem = { resId: request.restaurantId, resName: window.decodeURI(request.restaurantName), resImg: '' }
+    
+    const restaurantItem = { 
+      resId: request.restaurantId, 
+      resName: window.decodeURI(request.restaurantName), 
+      resImg: '' 
+    };
 
     invokeOnClosedRestaurantModalAppearing(undefined, targetButton => {
       logger('Found closed modal and took control over the button', targetButton);
@@ -85,7 +89,7 @@ const invokeByRequestMessage = {
       targetButton.onclick = event => {
         // send fetch request with everything we currently have
         event.preventDefault();
-
+        
         console.log('user clicked to notify him');
 
         // TODO: change logic to check for addressId || restId before clicking 'Notify Me'
