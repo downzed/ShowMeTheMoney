@@ -1,19 +1,30 @@
-chrome.storage.local.clear(function () {
-  const error = chrome.runtime.lastError;
-  if (error) {
-    console.error(error);
-  }
-});
+// chrome.storage.local.clear(function () {
+//   const error = chrome.runtime.lastError;
+//   if (error) {
+//     console.error(error);
+//   }
+// });
+
+function getListLength() {
+  chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
+    let list = result[consts.LOCALSTORAGE_ITEM_NAME] || [];
+    if (list.length > 0) {
+      chrome.browserAction.setBadgeText({ text: list.length > 5 ? '+5' : list.length.toString() })
+    }
+
+  })
+}
+
+getListLength();
 
 chrome.extension.onMessage.addListener(function (message, sender, reply) {
-  if (message.refreshLocalStorage) {
-    chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: message.list });
-  }  
+  
   if (message.flash) {
-    chrome.browserAction.setBadgeText({text: '+'})
+    chrome.browserAction.setBadgeText({text: '!'})
+    chrome.browserAction.setBadgeBackgroundColor({color: '#ea7702'})
     return;
   }
-  chrome.browserAction.setBadgeText({ text: '' })
+  getListLength()
 });
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
@@ -23,6 +34,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   }
   const isInMenuPage = consts.MENU_PAGE_URLS.filter(url => tab.url.indexOf(url) !== -1 )
   if (!isInMenuPage) {
+    chrome.storage.local.remove(consts.LOCALSTORAGE_QUE_NAME);
     return;
   }
 
