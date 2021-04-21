@@ -8,7 +8,7 @@ Chrome extension that provides you with browser notifications as soon as a previ
 based on `"manifest_version": 2`
 
 
-## Figma
+## Examples
 
 
 <img width="965" alt="Add to queue" src="https://raw.githubusercontent.com/downzed/tenbis-reOpen-ext/main/Screenshots/1.png">
