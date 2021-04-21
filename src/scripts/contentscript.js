@@ -63,12 +63,15 @@ const invokeByRequestMessage = {
       restaurantId: request.restaurantId,
       restaurantName: request.restaurantName,
     });
-    
-    const restaurantItem = { 
+    const restaurantLogoNode = document.querySelector('[class*="DiagonalHeaderView__CircleImage"')
+    const resImg = restaurantLogoNode?.getAttribute('src') || 'https://d25t2285lxl5rf.cloudfront.net/images/shops/default.png'
+    let restaurantItem = { 
       resId: request.restaurantId, 
       resName: window.decodeURI(request.restaurantName), 
-      resImg: '' 
+      resImg 
     };
+
+    console.debug({ restaurantItem})
 
     invokeOnClosedRestaurantModalAppearing(undefined, targetButton => {
       logger('Found closed modal and took control over the button', targetButton);
@@ -100,7 +103,7 @@ const invokeByRequestMessage = {
             chrome.extension.sendMessage({ flash: true })
             return;
           }
-
+          console.log(`restaurantItem`, restaurantItem)
           list.push(restaurantItem);
           console.log(list)
           chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list });

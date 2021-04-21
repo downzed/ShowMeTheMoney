@@ -18,8 +18,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.status !== 'complete') {
     return;
   }
-
-  const isInMenuPage = tab.url.indexOf(consts.MENU_PAGE_URL) !== -1;
+  const isInMenuPage = consts.MENU_PAGE_URLS.filter(url => tab.url.indexOf(url) !== -1 )
   if (!isInMenuPage) {
     return;
   }
