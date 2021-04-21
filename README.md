@@ -7,6 +7,10 @@ Chrome extension that provides you with browser notifications as soon as a previ
 
 based on `"manifest_version": 2`
 
+
+## figma
+https://www.figma.com/file/LLk8UtIzC46isNgSbBx93T/%23hack-1-21-reopen-ext?node-id=3%3A0
+
 <img width="911" alt="Screen Shot 2021-04-21 at 8 22 51" src="https://user-images.githubusercontent.com/6795014/115500873-d51ba280-a27a-11eb-8841-0345d087273e.png">
 
 <img width="911" alt="Motivation" src="https://user-images.githubusercontent.com/6795014/115500642-5fafd200-a27a-11eb-943d-6267623f52f4.png">
