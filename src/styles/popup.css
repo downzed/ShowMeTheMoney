@@ -2,7 +2,6 @@
 html {
 	padding: 12px;
 	width: 360px;
-	height: 268px;
 	overflow: auto;
 	background: #F8F5F2;
 	border: 0.5px solid #BABABA;
@@ -19,11 +18,12 @@ html {
 	width: 328px;
 	height: 64px;
 	background: #FFFFFF;
+	margin-bottom: 8px;
 	border-radius: 5px;
 }
 
 #--reOpen-ext-list li:hover {
-	background: 1px solid #FDFDFD;
+	background: #FDFDFD;
 }
 
 .ext-list-item {
@@ -40,12 +40,30 @@ html {
 }
 
 
-.ext-list-item img.ext-rest-logo {
+.ext-list-item-details img.ext-rest-logo {
 	width: 32px;
 	border-radius: 50%;
-	margin-right: 4px;
+	margin-right: 12px;
 }
 .ext-list-item img.ext-close-icon {
 	width: 12px;
 	cursor: pointer;
+}
+
+#--reOpen-ext-popup-wrapper .ext-popup-header {
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ext-popup-header h3 { 
+	font-size: 20px;
+}
+
+.ext-popup-header img {
+	width: 60px;
+}
+
+.ext-popup-header span {
+	font-size: 14px;
 }
