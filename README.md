@@ -10,12 +10,19 @@ based on `"manifest_version": 2`
 
 ## Examples
 
+Easy access to the extension with a simple way to add a closed restaurant to your watchlist.
 
 <img width="965" alt="Add to queue" src="https://raw.githubusercontent.com/downzed/tenbis-reOpen-ext/main/Screenshots/1.png">
 
+Success message once you added a restaurant to your queue.
+
 <img width="965" alt="Success" src="https://raw.githubusercontent.com/downzed/tenbis-reOpen-ext/main/Screenshots/2.png">
 
+View of restaurants you're keeping your eye (and stomach) out for. You have the chance to remove from your watchlist if you caved for a pb&j or ordered from somehwere else.
+
 <img width="965" alt="Queue" src="https://raw.githubusercontent.com/downzed/tenbis-reOpen-ext/main/Screenshots/3.png">
+
+Notification that your favorite restaurant has opened up leading you back to the menu. Stay satisfied & satiated!
 
 <img width="965" alt="Notification" src="https://raw.githubusercontent.com/downzed/tenbis-reOpen-ext/main/Screenshots/4.png">
 
