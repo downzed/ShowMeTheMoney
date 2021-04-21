@@ -1,9 +1,10 @@
-chrome.storage.local.clear(function () {
-  const error = chrome.runtime.lastError;
-  if (error) {
-    console.error(error);
-  }
-});
+// while DEVing - clear local cache on each reload
+// chrome.storage.local.clear(function () {
+//   const error = chrome.runtime.lastError;
+//   if (error) {
+//     console.error(error);
+//   }
+// });
 
 function getListLength() {
   chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {

@@ -35,6 +35,9 @@ html {
 .ext-list-item-details {
 	display: flex;
 	align-items: center;
+	color: #0A3847;
+	font-weight: bold;
+	font-size: 13px;
 }
 
 
