@@ -32,8 +32,9 @@ function handleRemoveItem(removeItem) {
 		let list = result[consts.LOCALSTORAGE_ITEM_NAME] || [];
 		
 		list = list.filter((item) => item.resId !== removeItem.resId);
-		
+
 		chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list }, function () {
+			chrome.extension.sendMessage({ flash: false })
 			setTimeout(function () {
 				window.location.reload()
 			}, 500)
