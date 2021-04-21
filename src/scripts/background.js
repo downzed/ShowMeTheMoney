@@ -1,3 +1,4 @@
+// while DEVing - clear local cache on each reload
 // chrome.storage.local.clear(function () {
 //   const error = chrome.runtime.lastError;
 //   if (error) {
