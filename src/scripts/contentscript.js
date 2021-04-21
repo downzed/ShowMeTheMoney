@@ -63,15 +63,15 @@ const invokeByRequestMessage = {
       restaurantId: request.restaurantId,
       restaurantName: request.restaurantName,
     });
+    
     const restaurantLogoNode = document.querySelector('[class*="DiagonalHeaderView__CircleImage"')
     const resImg = restaurantLogoNode?.getAttribute('src') || 'https://d25t2285lxl5rf.cloudfront.net/images/shops/default.png'
+    
     let restaurantItem = { 
       resId: request.restaurantId, 
       resName: window.decodeURI(request.restaurantName), 
       resImg 
     };
-
-    console.debug({ restaurantItem})
 
     invokeOnClosedRestaurantModalAppearing(undefined, targetButton => {
       logger('Found closed modal and took control over the button', targetButton);
