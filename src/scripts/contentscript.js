@@ -107,7 +107,9 @@ const invokeByRequestMessage = {
             return;
           }
           list.push(restaurantItem);
-          chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list });
+          chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list }, function () {
+            chrome.storage.local.remove(consts.LOCALSTORAGE_QUE_NAME);
+          });
           chrome.extension.sendMessage({ flash: true })
         });
       };
