@@ -26,7 +26,6 @@ const getAddressFromContextCookie = (docCookie = document.cookie) => {
     return;
   }
 };
-
 const invokeOnClosedRestaurantModalAppearing = (tryNumber = 0, cb) => {
   if (tryNumber === 0) {
     logger('Checking closed modal appears in the DOM');
@@ -62,8 +61,14 @@ const invokeByRequestMessage = {
     logger('restaurant info', {
       deliveryMethod: request.deliveryMethod,
       restaurantId: request.restaurantId,
-      restaurantName: request.restaurantName
+      restaurantName: request.restaurantName,
     });
+    
+    const restaurantItem = { 
+      resId: request.restaurantId, 
+      resName: window.decodeURI(request.restaurantName), 
+      resImg: '' 
+    };
 
     invokeOnClosedRestaurantModalAppearing(undefined, targetButton => {
       logger('Found closed modal and took control over the button', targetButton);
@@ -86,6 +91,21 @@ const invokeByRequestMessage = {
         event.preventDefault();
         
         console.log('user clicked to notify him');
+
+        // TODO: change logic to check for addressId || restId before clicking 'Notify Me'
+        chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
+          let list = result[consts.LOCALSTORAGE_ITEM_NAME] || [];
+          if (list.length && list.indexOf(restaurantItem) > -1) {
+            logger(restaurantItem.resName + ' Already in queue');
+            chrome.extension.sendMessage({ flash: true })
+            return;
+          }
+
+          list.push(restaurantItem);
+          console.log(list)
+          chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list });
+          chrome.extension.sendMessage({ flash: true })
+        });
       };
 
       targetButton.innerHTML = 'Notify me';
@@ -94,13 +114,13 @@ const invokeByRequestMessage = {
 };
 
 chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
+  function (request, sender, sendResponse) {
     // listen for messages sent from background.js
     try {
       invokeByRequestMessage[request.message](request);
-    } catch(error) {
-      logger('Message not recognized', {message: request.message});
+    } catch (error) {
+      logger('Message not recognized', { message: request.message });
       console.error('[ReOpen EXT]', error);
-    };   
+    };
   }
 );
