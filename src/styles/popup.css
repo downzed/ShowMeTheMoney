@@ -44,7 +44,7 @@ html {
 	border-radius: 50%;
 	margin-right: 12px;
 }
-.ext-list-item img.ext-close-icon {
+.ext-list-item img.ext-remove-icon {
 	width: 12px;
 	cursor: pointer;
 }

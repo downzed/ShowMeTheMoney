@@ -85,14 +85,6 @@ const invokeByRequestMessage = {
       const restaurantNameNode = document.querySelector('[class*="RestaurantInfo__RestaurantName"').innerText;
       const resImg = restaurantLogoNode?.getAttribute('src') || 'https://d25t2285lxl5rf.cloudfront.net/images/shops/default.png';
 
-      chrome.storage.local.set({
-        [consts.LOCALSTORAGE_QUE_NAME]: {
-          resId: request.restaurantId,
-          resName: restaurantNameNode,
-          resImg
-        } 
-      });
-
       targetButton.onclick = event => {
         // send fetch request with everything we currently have
         event.preventDefault();
@@ -114,7 +106,6 @@ const invokeByRequestMessage = {
             chrome.extension.sendMessage({ flash: true })
             return;
           }
-          console.log(`restaurantItem`, restaurantItem)
           list.push(restaurantItem);
           chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list });
           chrome.extension.sendMessage({ flash: true })
@@ -122,6 +113,13 @@ const invokeByRequestMessage = {
       };
 
       targetButton.innerHTML = 'Notify me';
+      chrome.storage.local.set({
+        [consts.LOCALSTORAGE_QUE_NAME]: {
+          resId: request.restaurantId,
+          resName: restaurantNameNode,
+          resImg
+        }
+      });
     });
   },
 };
