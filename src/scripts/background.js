@@ -19,6 +19,7 @@ function getListLength() {
 }
 
 getListLength();
+let tenBisTabId;
 
 chrome.extension.onMessage.addListener(function (message, sender, reply) {
   
@@ -29,12 +30,17 @@ chrome.extension.onMessage.addListener(function (message, sender, reply) {
   getListLength()
 });
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+let isInMenuPage;
 
+const registerTabId = id => tenBisTabId = id;
+
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.status !== 'complete') {
     return;
   }
-  const isInMenuPage = consts.MENU_PAGE_URLS.filter(url => tab.url.indexOf(url) !== -1 )
+  registerTabId(tabId);
+
+  isInMenuPage = consts.MENU_PAGE_URLS.filter(url => tab.url.indexOf(url) !== -1 )
   if (!isInMenuPage) {
     chrome.storage.local.remove(consts.LOCALSTORAGE_QUE_NAME);
     return;
@@ -53,4 +59,11 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     restaurantName
   });
 
+});
+
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+  if (tenBisTabId && (activeInfo.tabId === tenBisTabId) && isInMenuPage) {
+    // console.log(`123, ${tenBisTabId}`)
+    // chrome.storage.local.remove(consts.LOCALSTORAGE_QUE_NAME);
+  }
 });

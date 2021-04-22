@@ -65,12 +65,14 @@ html {
 .ext-popup-header h3 { 
 	font-size: 20px;
 	margin: 8px 0 0 0;
+	color: #0A3847;
 }
 
 
-.ext-popup-header span#ext-popup-subtext {
+.ext-popup-header #ext-popup-subtext {
 	font-size: 14px;
 	margin: 40px 0;
+	color: #0A3847;
 }
 
 .ext-list-track-btn {
@@ -88,4 +90,28 @@ html {
 }
 .ext-list-track-btn :hover {
 	background-color: #0e6ef3;
+}
+
+.ext-popup-success {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding-top: 34px;
+	display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.ext-popup-success img.success-image {
+	margin-bottom: 38px;
+	width: 120px;
+}
+
+.ext-popup-success #ext-popup-subtext{
+	font-size: 16px;
+	line-height: 24px;
+	text-align: center;
+	color: #0A3847;
 }
