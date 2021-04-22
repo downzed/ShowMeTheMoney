@@ -8,7 +8,7 @@ Chrome extension that provides you with browser notifications as soon as a previ
 based on `"manifest_version": 2`
 
 ## How to install
-Clone or download repo and then follow the steps in the link <br />
+Clone or download the repo and then follow the steps in the link <br />
 https://webkul.com/blog/how-to-install-the-unpacked-extension-in-chrome/
 
 ## Examples
