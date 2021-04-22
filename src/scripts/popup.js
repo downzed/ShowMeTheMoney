@@ -100,7 +100,7 @@ chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
 	} 
 
 	const listContainer = document.createElement('ul');
-	listContainer.setAttribute('id', '--reOpen-ext-list');
+	listContainer.setAttribute('id', 'ext-list');
 	
 	subtext.innerHTML = 'Currently keeping an eye on:';
 

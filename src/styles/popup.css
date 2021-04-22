@@ -1,4 +1,3 @@
-
 html {
 	padding: 12px;
 	width: 360px;
@@ -8,19 +7,19 @@ html {
 	box-sizing: border-box;
 }
 
-#--reOpen-ext-list {
+#ext-list {
 	padding: 0;
 	margin: 0;
 	list-style: none;
 	height: -webkit-fill-available;
 }
 
-#--reOpen-ext-list li {
+#ext-list li {
 	width: 100%;
 	padding: 0;
 	height: 64px;
 	background: #FFFFFF;
-	margin:0 0 8px 0;
+	margin: 0 0 8px 0;
 	border-radius: 5px;
 }
 
@@ -38,8 +37,8 @@ html {
 	color: #0A3847;
 	font-weight: bold;
 	font-size: 13px;
+	text-transform: capitalize;
 }
-
 
 .ext-list-item-details img.ext-rest-logo {
 	width: 32px;
@@ -47,15 +46,16 @@ html {
 	border-radius: 50%;
 	margin-right: 12px;
 }
+
 .ext-list-item img.ext-remove-icon {
 	width: 12px;
 	cursor: pointer;
 }
 
-#--reOpen-ext-popup-wrapper .ext-popup-header {
+#ext-popup-wrapper .ext-popup-header {
 	display: flex;
-    flex-direction: column;
-    align-items: center;
+	flex-direction: column;
+	align-items: center;
 }
 
 .ext-popup-header img {
