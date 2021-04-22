@@ -19,6 +19,12 @@
       "src/scripts/background.js"
     ]
   },
+  "icons": {
+    "16": "icons/EXT-Logo-16.png",
+    "32": "icons/EXT-Logo-32.png",
+    "48": "icons/EXT-Logo-60.png",
+    "128": "icons/EXT-Logo-60.png"
+  },
   "browser_action": {
     "default_popup": "src/popup.html",
     "default_icon": {
