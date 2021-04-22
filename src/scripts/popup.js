@@ -2,6 +2,17 @@ function createEmptyPage(wrapperElement, subtext) {
 	const trackButton = document.createElement('div');
 	
 	trackButton.setAttribute('class', 'ext-list-track-btn');
+  const header = document.getElementsByClassName('ext-popup-header')[0];
+  const successDiv = document.createElement('div');
+  successDiv.setAttribute('class', 'ext-popup-success');
+  successDiv.innerHTML = `
+    <img src='../../icons/animation.gif' class='success-image'/>
+    <div id='ext-popup-subtext'>
+    This restaurant has been added!
+    <br />
+    We'll let you know once it opens up.
+    </div>
+  `;
 	trackButton.innerHTML = 'Track this restaurant';
 
 	chrome.storage.local.get([consts.LOCALSTORAGE_QUE_NAME], (result) => {
@@ -12,9 +23,15 @@ function createEmptyPage(wrapperElement, subtext) {
 				list.push(localQueItem);
 
 				chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list }, function (){
-					setTimeout(function () {
-						chrome.storage.local.remove(consts.LOCALSTORAGE_QUE_NAME);
-						window.location.reload();
+          setTimeout(function () {
+            header.style.display = 'none';
+            trackButton.style.display = 'none';
+            wrapperElement.style.height = '228px';
+            wrapperElement.appendChild(successDiv);
+            chrome.storage.local.remove(consts.LOCALSTORAGE_QUE_NAME);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
 					}, 100)
 				});
 			}
@@ -36,9 +53,6 @@ function handleRemoveItem(removeItem) {
 		list = list.filter((item) => item.resId !== removeItem.resId);
 
 		chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list }, function () {
-			if (!list.length) {
-				chrome.storage.local.set({ [consts.LOCALSTORAGE_QUE_NAME]: removeItem });
-			}
 			chrome.extension.sendMessage({ flash: false })
 			setTimeout(function () {
 				window.location.reload()
