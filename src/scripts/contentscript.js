@@ -26,6 +26,7 @@ const getAddressFromContextCookie = (docCookie = document.cookie) => {
     return;
   }
 };
+
 const invokeOnClosedRestaurantModalAppearing = (tryNumber = 0, cb) => {
   if (tryNumber === 0) {
     logger('Checking closed modal appears in the DOM');
@@ -63,8 +64,6 @@ const invokeByRequestMessage = {
       restaurantId: request.restaurantId,
       restaurantName: request.restaurantName,
     });
-    
-    
 
     invokeOnClosedRestaurantModalAppearing(undefined, targetButton => {
       logger('Found closed modal and took control over the button', targetButton);
@@ -73,25 +72,23 @@ const invokeByRequestMessage = {
 
       if (!addressInfo) {
         console.error('[ReOpen EXT]', addressInfo);
-        throw new Error('wtf ... why cant we get addressInfo??');
+        throw new Error('weird... why cant we get addressInfo??');
         return;
       }
 
       logger('addressInfo', addressInfo);
 
-      // on click will take 10bis's closed modal off the dom.
-      // so success / error state should be invoked differently.
       const restaurantLogoNode = document.querySelector('[class*="DiagonalHeaderView__CircleImage"');
       const restaurantNameNode = document.querySelector('[class*="RestaurantInfo__RestaurantName"').innerText;
       const resImg = restaurantLogoNode?.getAttribute('src') || 'https://d25t2285lxl5rf.cloudfront.net/images/shops/default.png';
 
       targetButton.onclick = event => {
-        // send fetch request with everything we currently have
         event.preventDefault();
         
         console.log('user clicked to notify him');
 
-        // TODO: change logic to check for addressId || restId before clicking 'Notify Me'
+        // TODO: validate props and send fetch request.
+
         chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
           let list = result[consts.LOCALSTORAGE_ITEM_NAME] || [];
 
@@ -103,18 +100,25 @@ const invokeByRequestMessage = {
 
           if (list.length && list.indexOf(restaurantItem) > -1) {
             logger(restaurantItem.resName + ' Already in queue');
-            chrome.extension.sendMessage({ flash: true })
+            chrome.extension.sendMessage({ flash: true });
+
             return;
           }
+
           list.push(restaurantItem);
+
+          // storing info on locaclStorage
           chrome.storage.local.set({ [consts.LOCALSTORAGE_ITEM_NAME]: list }, function () {
             chrome.storage.local.remove(consts.LOCALSTORAGE_QUE_NAME);
           });
-          chrome.extension.sendMessage({ flash: true })
+
+          chrome.extension.sendMessage({ flash: true }); // badge
         });
       };
 
+      targetButton.classList.add('ext-notify-button');
       targetButton.innerHTML = 'Notify me';
+
       chrome.storage.local.set({
         [consts.LOCALSTORAGE_QUE_NAME]: {
           resId: request.restaurantId,
@@ -122,6 +126,7 @@ const invokeByRequestMessage = {
           resImg
         }
       });
+
     });
   },
 };

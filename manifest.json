@@ -8,7 +8,9 @@
     "webNavigation",
     "activeTab",
     "storage",
-    "https://www.10bis.co.il/next/*"
+    "notifications",
+    "https://www.10bis.co.il/next/*",
+    "https://d25t2285lxl5rf.cloudfront.net/*"
   ],
   "background": {
     "persistent": true,

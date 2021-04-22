@@ -1,43 +1,55 @@
-// while DEVing - clear local cache on each reload
-// chrome.storage.local.clear(function () {
-//   const error = chrome.runtime.lastError;
-//   if (error) {
-//     console.error(error);
-//   }
-// });
+let isInMenuPage;
+let tenBisTabId;
 
 function getListLength() {
   chrome.storage.local.get([consts.LOCALSTORAGE_ITEM_NAME], (result) => {
     let list = result[consts.LOCALSTORAGE_ITEM_NAME] || [];
-    if (list.length > 0) {
-      chrome.browserAction.setBadgeText({ text: list.length > 5 ? '+5' : list.length.toString() });
-      chrome.browserAction.setBadgeBackgroundColor({ color: '#ea7702' });
+    
+    if (list.length) {
+      chrome.browserAction.setBadgeText({text: list.length > 5 ? '+5' : list.length.toString()});
+      chrome.browserAction.setBadgeBackgroundColor({color: '#ea7702'});
       return;
     }
-    chrome.browserAction.setBadgeText({ text: '' })
+
+    chrome.browserAction.setBadgeText({ text: '' });
   })
-}
+};
 
 getListLength();
-let tenBisTabId;
 
 chrome.extension.onMessage.addListener(function (message, sender, reply) {
-  
   if (message.flash) {
-    chrome.browserAction.setBadgeText({text: '!'})
+    chrome.browserAction.setBadgeText({text: '!'});
     return;
   }
-  getListLength()
+
+  getListLength();
 });
 
-let isInMenuPage;
+const registerTabId = id => {tenBisTabId = id};
 
-const registerTabId = id => tenBisTabId = id;
+// notification listener
+chrome.runtime.onMessage.addListener(data => {
+  if (data.type !== 'notification') {
+    return; 
+  }
 
+  chrome.notifications.create('', data.options, notificationId => {
+    chrome.notifications.onClicked.addListener(() => {
+
+      console.log('data notification', data);
+      chrome.tabs.create({ url: data.restaurantUrl }); 
+
+    });
+  });
+});
+
+// init
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.status !== 'complete') {
     return;
   }
+
   registerTabId(tabId);
 
   isInMenuPage = consts.MENU_PAGE_URLS.filter(url => tab.url.indexOf(url) !== -1 )
@@ -61,9 +73,9 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
 });
 
+// popup state managment
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   if (tenBisTabId && (activeInfo.tabId === tenBisTabId) && isInMenuPage) {
-    // console.log(`123, ${tenBisTabId}`)
     // chrome.storage.local.remove(consts.LOCALSTORAGE_QUE_NAME);
   }
 });

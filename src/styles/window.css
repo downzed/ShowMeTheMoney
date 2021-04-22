@@ -1,23 +1,4 @@
-.--reOpen-ext--root {
-  position: fixed;
-  top: 10px;
-  right: 15px;
-
-  z-index: 1200;
-
-  background: #fff;
-  box-shadow: rgb(41 57 181) -5px 5px 1px;
-
-  padding: 20px;
-
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.--reOpen-ext--with-opacity {
-  opacity: 1;
-}
-
-h1.--reOpen-ext--text {
-  font-size: 18px;
+.ext-notify-button {
+	color: rgb(21, 116, 245);
+	font-weight: bold;
 }
